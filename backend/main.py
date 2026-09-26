@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from database import engine, Base, SessionLocal
 from models import User, Task
-from auth import hash_password
+from auth import hash_password, verify_password
 
 class UserCreate(BaseModel):
     name: str
@@ -20,6 +20,10 @@ class TaskCreate(BaseModel):
 class TaskUpdate(BaseModel):
     title: str
     description: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
 
 UserCreate.model_rebuild()
@@ -226,4 +230,42 @@ def complete_task(task_id: int):
     return {
         "message": "Task marked as completed",
         "task": task
+    }
+@app.post("/login")
+def login(user: LoginRequest):
+
+    db = SessionLocal()
+
+    existing_user = db.query(User).filter(
+        User.email == user.email
+    ).first()
+
+    if not existing_user:
+        db.close()
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    password_correct = verify_password(
+        user.password,
+        existing_user.password
+    )
+
+    if not password_correct:
+        db.close()
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    db.close()
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "id": existing_user.id,
+            "name": existing_user.name,
+            "email": existing_user.email
+        }
     }
