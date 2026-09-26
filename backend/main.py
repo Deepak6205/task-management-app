@@ -1,9 +1,14 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException,Depends
 from pydantic import BaseModel
 
 from database import engine, Base, SessionLocal
 from models import User, Task
-from auth import hash_password, verify_password, create_access_token
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user
+)
 
 class UserCreate(BaseModel):
     name: str
@@ -117,11 +122,13 @@ def create_task(task: TaskCreate):
 # ---------------- GET ALL TASKS ----------------
 
 @app.get("/tasks")
-def get_tasks():
+def get_tasks(user_id: int = Depends(get_current_user)):
 
     db = SessionLocal()
 
-    tasks = db.query(Task).all()
+    tasks = db.query(Task).filter(
+        Task.user_id == user_id
+    ).all()
 
     db.close()
 
