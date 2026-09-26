@@ -19,7 +19,6 @@ class UserCreate(BaseModel):
 class TaskCreate(BaseModel):
     title: str
     description: str
-    user_id: int
 
 
 class TaskUpdate(BaseModel):
@@ -81,24 +80,17 @@ def create_user(user: UserCreate):
 # ---------------- CREATE TASK ----------------
 
 @app.post("/tasks")
-def create_task(task: TaskCreate):
+def create_task(
+    task: TaskCreate,
+    user_id: int = Depends(get_current_user)
+):
 
     db = SessionLocal()
-
-    # Check whether user exists
-    user = db.query(User).filter(User.id == task.user_id).first()
-
-    if not user:
-        db.close()
-        raise HTTPException(
-            status_code=404,
-            detail="User not found"
-        )
 
     new_task = Task(
         title=task.title,
         description=task.description,
-        user_id=task.user_id
+        user_id=user_id
     )
 
     db.add(new_task)
@@ -138,11 +130,17 @@ def get_tasks(user_id: int = Depends(get_current_user)):
 # ---------------- GET ONE TASK ----------------
 
 @app.get("/tasks/{task_id}")
-def get_task(task_id: int):
+def get_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
 
     db.close()
 
@@ -154,15 +152,21 @@ def get_task(task_id: int):
 
     return task
 
-
 # ---------------- UPDATE TASK ----------------
 
 @app.put("/tasks/{task_id}")
-def update_task(task_id: int, task_data: TaskUpdate):
+def update_task(
+    task_id: int,
+    task_data: TaskUpdate,
+    user_id: int = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
 
     if not task:
         db.close()
@@ -188,11 +192,17 @@ def update_task(task_id: int, task_data: TaskUpdate):
 # ---------------- DELETE TASK ----------------
 
 @app.delete("/tasks/{task_id}")
-def delete_task(task_id: int):
+def delete_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
 
     if not task:
         db.close()
@@ -210,15 +220,20 @@ def delete_task(task_id: int):
         "message": "Task deleted successfully"
     }
 
-
 # ---------------- MARK TASK COMPLETE ----------------
 
 @app.patch("/tasks/{task_id}/complete")
-def complete_task(task_id: int):
+def complete_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    task = db.query(Task).filter(Task.id == task_id).first()
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
 
     if not task:
         db.close()
@@ -238,6 +253,9 @@ def complete_task(task_id: int):
         "message": "Task marked as completed",
         "task": task
     }
+
+#---------------- LOGIN -----------------
+
 @app.post("/login")
 def login(user: LoginRequest):
 
