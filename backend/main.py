@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from database import engine, Base, SessionLocal
 from models import User, Task
-
+from auth import hash_password
 
 class UserCreate(BaseModel):
     name: str
@@ -45,10 +45,12 @@ def create_user(user: UserCreate):
 
     db = SessionLocal()
 
+    hashed_password = hash_password(user.password)
+
     new_user = User(
         name=user.name,
         email=user.email,
-        password=user.password
+        password=hashed_password
     )
 
     db.add(new_user)
