@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 from database import engine, Base, SessionLocal
 from models import User, Task
-from auth import hash_password, verify_password
+from auth import hash_password, verify_password, create_access_token
 
 class UserCreate(BaseModel):
     name: str
@@ -260,12 +260,14 @@ def login(user: LoginRequest):
         )
 
     db.close()
-
+    access_token = create_access_token(existing_user.id)
     return {
         "message": "Login successful",
-        "user": {
-            "id": existing_user.id,
-            "name": existing_user.name,
-            "email": existing_user.email
+    "access_token": access_token,
+    "token_type": "bearer",
+    "user": {
+        "id": existing_user.id,
+        "name": existing_user.name,
+        "email": existing_user.email
         }
     }
