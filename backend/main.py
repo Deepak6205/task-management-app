@@ -1,26 +1,298 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException,Depends
 from pydantic import BaseModel
 
-app = FastAPI()
+from database import engine, Base, SessionLocal
+from models import User, Task
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user
+)
 
-
-class User(BaseModel):
+class UserCreate(BaseModel):
     name: str
     email: str
     password: str
 
+
+class TaskCreate(BaseModel):
+    title: str
+    description: str
+
+
+class TaskUpdate(BaseModel):
+    title: str
+    description: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+UserCreate.model_rebuild()
+TaskCreate.model_rebuild()
+TaskUpdate.model_rebuild()
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI()
+
+
+# ---------------- HOME ----------------
 
 @app.get("/")
 def home():
     return {"message": "Task Management API is running"}
 
 
+# ---------------- USERS ----------------
+
 @app.post("/users")
-def create_user(user: User):
+def create_user(user: UserCreate):
+
+    db = SessionLocal()
+
+    hashed_password = hash_password(user.password)
+
+    new_user = User(
+        name=user.name,
+        email=user.email,
+        password=hashed_password
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    db.close()
+
     return {
         "message": "User created successfully",
         "user": {
-            "name": user.name,
-            "email": user.email
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email
         }
-    }   
+    }
+
+
+# ---------------- CREATE TASK ----------------
+
+@app.post("/tasks")
+def create_task(
+    task: TaskCreate,
+    user_id: int = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    new_task = Task(
+        title=task.title,
+        description=task.description,
+        user_id=user_id
+    )
+
+    db.add(new_task)
+    db.commit()
+    db.refresh(new_task)
+
+    db.close()
+
+    return {
+        "message": "Task created successfully",
+        "task": {
+            "id": new_task.id,
+            "title": new_task.title,
+            "description": new_task.description,
+            "completed": new_task.completed,
+            "user_id": new_task.user_id
+        }
+    }
+
+
+# ---------------- GET ALL TASKS ----------------
+
+@app.get("/tasks")
+def get_tasks(user_id: int = Depends(get_current_user)):
+
+    db = SessionLocal()
+
+    tasks = db.query(Task).filter(
+        Task.user_id == user_id
+    ).all()
+
+    db.close()
+
+    return tasks
+
+
+# ---------------- GET ONE TASK ----------------
+
+@app.get("/tasks/{task_id}")
+def get_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
+
+    db.close()
+
+    if not task:
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    return task
+
+# ---------------- UPDATE TASK ----------------
+
+@app.put("/tasks/{task_id}")
+def update_task(
+    task_id: int,
+    task_data: TaskUpdate,
+    user_id: int = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
+
+    if not task:
+        db.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    task.title = task_data.title
+    task.description = task_data.description
+
+    db.commit()
+    db.refresh(task)
+
+    db.close()
+
+    return {
+        "message": "Task updated successfully",
+        "task": task
+    }
+
+
+# ---------------- DELETE TASK ----------------
+
+@app.delete("/tasks/{task_id}")
+def delete_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
+
+    if not task:
+        db.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    db.delete(task)
+    db.commit()
+
+    db.close()
+
+    return {
+        "message": "Task deleted successfully"
+    }
+
+# ---------------- MARK TASK COMPLETE ----------------
+
+@app.patch("/tasks/{task_id}/complete")
+def complete_task(
+    task_id: int,
+    user_id: int = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    task = db.query(Task).filter(
+        Task.id == task_id,
+        Task.user_id == user_id
+    ).first()
+
+    if not task:
+        db.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Task not found"
+        )
+
+    task.completed = True
+
+    db.commit()
+    db.refresh(task)
+
+    db.close()
+
+    return {
+        "message": "Task marked as completed",
+        "task": task
+    }
+
+#---------------- LOGIN -----------------
+
+@app.post("/login")
+def login(user: LoginRequest):
+
+    db = SessionLocal()
+
+    existing_user = db.query(User).filter(
+        User.email == user.email
+    ).first()
+
+    if not existing_user:
+        db.close()
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    password_correct = verify_password(
+        user.password,
+        existing_user.password
+    )
+
+    if not password_correct:
+        db.close()
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    db.close()
+    access_token = create_access_token(existing_user.id)
+    return {
+        "message": "Login successful",
+    "access_token": access_token,
+    "token_type": "bearer",
+    "user": {
+        "id": existing_user.id,
+        "name": existing_user.name,
+        "email": existing_user.email
+        }
+    }
