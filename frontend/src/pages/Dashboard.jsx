@@ -39,6 +39,13 @@ function Dashboard() {
       previousTasks.filter((task) => task.id !== taskId),
     );
   };
+  const handleTaskUpdated = (updatedTask) => {
+    setTasks((previousTasks) =>
+      previousTasks.map((task) =>
+        task.id === updatedTask.id ? updatedTask : task,
+      ),
+    );
+  };
 
   return (
     <div>
@@ -58,6 +65,7 @@ function Dashboard() {
             key={task.id}
             task={task}
             onTaskDeleted={handleTaskDeleted}
+            onTaskUpdated={handleTaskUpdated}
           />
         ))
       )}

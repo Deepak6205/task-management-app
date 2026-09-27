@@ -1,4 +1,9 @@
-function TaskItem({ task, onTaskDeleted }) {
+import { useState } from "react";
+import EditTask from "./EditTask";
+
+function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
+  const [isEditing, setIsEditing] = useState(false);
+
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
 
@@ -25,10 +30,27 @@ function TaskItem({ task, onTaskDeleted }) {
     }
   };
 
+  const handleTaskUpdated = (updatedTask) => {
+    setIsEditing(false);
+    onTaskUpdated(updatedTask);
+  };
+
+  if (isEditing) {
+    return (
+      <EditTask
+        task={task}
+        onTaskUpdated={handleTaskUpdated}
+        onCancel={() => setIsEditing(false)}
+      />
+    );
+  }
+
   return (
     <div>
       <h3>{task.title}</h3>
       <p>{task.description}</p>
+
+      <button onClick={() => setIsEditing(true)}>Edit</button>
 
       <button onClick={handleDelete}>Delete</button>
     </div>
