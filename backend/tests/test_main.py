@@ -43,10 +43,49 @@ def test_signup():
     db.close()
 
 
+def test_signup_duplicate_email():
+    email = "duplicate@example.com"
+
+    # Create the first user
+    first_response = client.post(
+        "/users",
+        json={
+            "name": "First User",
+            "email": email,
+            "password": "test123"
+        }
+    )
+
+    assert first_response.status_code == 200
+
+    # Try to create another user with the same email
+    second_response = client.post(
+        "/users",
+        json={
+            "name": "Second User",
+            "email": email,
+            "password": "test123"
+        }
+    )
+
+    assert second_response.status_code == 400
+    assert second_response.json()["detail"] == "Email already registered"
+
+    # Clean up test user
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+
+    if user:
+        db.delete(user)
+        db.commit()
+
+    db.close()
+
+
 def test_login():
-    # Create user for login test
     email = "logintest@example.com"
 
+    # Create user for login test
     signup_response = client.post(
         "/users",
         json={
@@ -58,6 +97,7 @@ def test_login():
 
     assert signup_response.status_code == 200
 
+    # Login
     response = client.post(
         "/login",
         json={
@@ -70,7 +110,7 @@ def test_login():
     assert response.json()["message"] == "Login successful"
     assert "access_token" in response.json()
 
-        # Clean up test user
+    # Clean up test user
     db = SessionLocal()
     user = db.query(User).filter(User.email == email).first()
 
@@ -123,6 +163,7 @@ def test_get_tasks_without_token():
     response = client.get("/tasks")
 
     assert response.status_code == 401
+
 
 def test_get_tasks_with_token():
     email = "tasktest@example.com"
