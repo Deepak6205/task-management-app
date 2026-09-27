@@ -10,6 +10,17 @@ from auth import (
     get_current_user
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class UserCreate(BaseModel):
     name: str
     email: str
@@ -36,7 +47,6 @@ TaskUpdate.model_rebuild()
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
 
 
 # ---------------- HOME ----------------
