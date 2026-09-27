@@ -1,6 +1,6 @@
-# Task Management Application
+# Task Management App
 
-A full-stack Task Management Application built to practice software engineering fundamentals, REST APIs, authentication, authorization, database integration, testing, and Git collaboration.
+A full-stack task management application built with FastAPI on the backend and React + Vite on the frontend. The app allows users to sign up, log in, create personal tasks, and manage them through a protected dashboard.
 
 ## Tech Stack
 
@@ -9,34 +9,31 @@ A full-stack Task Management Application built to practice software engineering 
 - FastAPI
 - SQLAlchemy
 - PostgreSQL
-- JWT Authentication
-- Argon2 Password Hashing
+- JWT authentication
+- Password hashing with `pwdlib`
+
+### Frontend
+- React
+- Vite
+- JavaScript
 
 ### Testing
 - Pytest
 - FastAPI TestClient
 
-### Tools
-- Git & GitHub
-- Swagger UI
-- Postman
-
 ---
 
 ## Features
 
-- User signup
+- User signup with email validation
 - Secure password hashing
-- User login
-- JWT-based authentication
-- Create tasks
-- View tasks
-- Update tasks
-- Delete tasks
-- Mark tasks as completed
-- User-based task authorization
-- Protected API endpoints
-- Basic automated tests
+- User login with JWT token generation
+- Protected API routes
+- Create, read, update, and delete tasks
+- Mark tasks as complete
+- User-specific task ownership
+- React dashboard for authenticated users
+- Logout flow with token removal from browser storage
 
 ---
 
@@ -44,22 +41,51 @@ A full-stack Task Management Application built to practice software engineering 
 
 ```text
 task-management-app/
-│
 ├── backend/
 │   ├── auth.py
 │   ├── database.py
 │   ├── main.py
 │   ├── models.py
 │   ├── requirements.txt
-│   │
-│   └── tests/
-│       ├── __init__.py
-│       └── test_main.py
-│
-├── .env
+│   ├── tests/
+│   │   ├── __init__.py
+│   │   └── test_main.py
+│   └── .env
+├── frontend/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── public/
+│   └── src/
+│       ├── App.jsx
+│       ├── main.jsx
+│       ├── index.css
+│       ├── components/
+│       │   ├── EditTask.jsx
+│       │   ├── TaskForm.jsx
+│       │   └── TaskItem.jsx
+│       ├── pages/
+│       │   ├── Dashboard.jsx
+│       │   ├── LoginPage.jsx
+│       │   └── SignupPage.jsx
+│       └── services/
+│           └── api.js
+├── README.md
+├── AI-LEARNING.md
 ├── .gitignore
-└── README.md
+└── .env.example (optional, if you create one locally)
 ```
+
+---
+
+## Prerequisites
+
+Before running the app, make sure you have:
+
+- Python 3.10+
+- Node.js and npm
+- PostgreSQL installed and running
+- Git
 
 ---
 
@@ -69,100 +95,98 @@ task-management-app/
 
 ```bash
 git clone https://github.com/Deepak6205/task-management-app.git
+cd task-management-app
 ```
 
-### 2. Move into the project
+### 2. Create and activate a virtual environment
 
 ```bash
-cd task-management-app/backend
-```
-
-### 3. Create a virtual environment
-
-```bash
+cd backend
 python -m venv venv
 ```
 
-### 4. Activate the virtual environment
-
-For Windows PowerShell:
+Windows PowerShell:
 
 ```powershell
 .\venv\Scripts\Activate.ps1
 ```
 
-### 5. Install dependencies
+macOS/Linux:
+
+```bash
+source venv/bin/activate
+```
+
+### 3. Install backend dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
+### 4. Configure environment variables
 
-## Environment Variables
-
-Create a `.env` file in the project root.
+Create a `.env` file inside the `backend` folder:
 
 ```env
 DB_HOST=localhost
 DB_NAME=task_management
 DB_USER=postgres
 DB_PASSWORD=your_database_password
-
 JWT_SECRET_KEY=your_long_random_secret
 ```
 
-Do not put your actual database password or JWT secret in the README or GitHub repository.
+Create the PostgreSQL database:
 
----
-
-## Database
-
-This project uses PostgreSQL.
-
-Create a database named:
-
-```text
-task_management
+```sql
+CREATE DATABASE task_management;
 ```
 
-The application uses SQLAlchemy to communicate with PostgreSQL.
+> Do not commit real secrets or credentials to GitHub.
 
 ---
 
 ## Run the Backend
 
-Move into the backend directory:
-
-```bash
-cd backend
-```
-
-Run the FastAPI server:
+From the backend folder:
 
 ```bash
 uvicorn main:app --reload
 ```
 
-The API will be available at:
+The API will run at:
 
 ```text
 http://127.0.0.1:8000
 ```
 
----
-
-## API Documentation
-
-FastAPI provides interactive API documentation using Swagger UI.
-
-Open:
+Swagger UI is available at:
 
 ```text
 http://127.0.0.1:8000/docs
 ```
 
-You can use Swagger UI to test the API endpoints.
+---
+
+## Frontend Setup
+
+### 1. Install frontend dependencies
+
+```bash
+cd ../frontend
+npm install
+```
+
+### 2. Start the React app
+
+```bash
+npm run dev
+```
+
+The frontend typically runs at:
+
+```text
+http://localhost:5173
+```
 
 ---
 
@@ -172,25 +196,60 @@ You can use Swagger UI to test the API endpoints.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/users` | Create a new user |
-| POST | `/login` | Login and receive JWT |
+| POST | `/users` | Register a new user |
+| POST | `/login` | Log in and receive a JWT |
 
 ### Tasks
 
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/tasks` | Create a task |
-| GET | `/tasks` | Get current user's tasks |
-| GET | `/tasks/{task_id}` | Get a specific task |
+| GET | `/tasks` | Get all tasks for the logged-in user |
+| GET | `/tasks/{task_id}` | Get one task by ID |
 | PUT | `/tasks/{task_id}` | Update a task |
 | DELETE | `/tasks/{task_id}` | Delete a task |
-| PATCH | `/tasks/{task_id}/complete` | Mark task as completed |
+| PATCH | `/tasks/{task_id}/complete` | Mark a task as completed |
 
-Protected task endpoints require a valid JWT:
+Protected task endpoints require:
 
 ```text
 Authorization: Bearer <access_token>
 ```
+
+---
+
+## Authentication Flow
+
+```text
+User signs up
+  ↓
+Password is hashed
+  ↓
+User logs in
+  ↓
+JWT token is generated
+  ↓
+Frontend stores token in localStorage
+  ↓
+Backend validates token on protected requests
+  ↓
+User can access dashboard and task APIs
+```
+
+---
+
+## Data Model
+
+This app uses a simple relational model:
+
+- A `User` can have many `Task` records
+- Each `Task` belongs to one `User`
+- A task stores:
+  - `id`
+  - `title`
+  - `description`
+  - `completed`
+  - `user_id`
 
 ---
 
@@ -202,97 +261,43 @@ From the `backend` directory:
 pytest
 ```
 
-The current test suite covers:
+The test suite currently checks:
 
-- API health check
-- User signup
+- Home route availability
+- User registration
+- Duplicate email rejection
 - Successful login
-- Login with incorrect password
-- Protected route without authentication
-- Protected route with valid JWT
+- Invalid login credentials
+- Access to protected task routes without a token
+- Access to protected task routes with a valid token
 
 ---
 
-## Authentication Flow
+## Typical Usage
 
-```text
-User
-  ↓
-Signup
-  ↓
-Password is hashed
-  ↓
-Login
-  ↓
-JWT token generated
-  ↓
-Client sends JWT
-  ↓
-Backend verifies JWT
-  ↓
-Protected API access
-```
+1. Open the frontend in the browser.
+2. Sign up for a new account.
+3. Log in with your email and password.
+4. Create tasks from the dashboard.
+5. Edit, delete, or mark tasks as complete.
+6. Log out when finished.
 
 ---
 
-## Database Relationship
+## Notes
 
-A user can have multiple tasks.
-
-```text
-User
- |
- | 1
- |
- |------< Tasks
-          |
-          | many
-```
-
-Each task contains a `user_id` that identifies its owner.
-
----
-
-## Git Workflow
-
-This project follows a feature-branch workflow.
-
-Example:
-
-```bash
-git switch main
-git pull
-
-git switch -c feature/task-crud
-
-git add .
-git commit -m "Build task CRUD APIs"
-
-git push -u origin feature/task-crud
-```
-
-Changes can then be reviewed through a Pull Request before merging into `main`.
-
----
-
-## Testing Philosophy
-
-The goal of testing is to verify that the API behaves as expected and that important authentication rules are working correctly.
-
-Tests can be run using:
-
-```bash
-pytest
-```
+- The backend uses CORS to allow requests from the frontend at `http://localhost:5173`.
+- The frontend stores the JWT in `localStorage` so the user remains authenticated during the session.
+- The app is intended as a learning project for backend APIs, authentication, database integration, and frontend integration.
 
 ---
 
 ## Future Improvements
 
-- React frontend
-- Better test database isolation
-- More automated tests
-- Improved API error handling
-- Frontend authentication
+- Better error handling and validation messages
 - Task filtering and sorting
-- Deployment to the cloud
+- Search by title or status
+- Frontend polish and responsive styling
+- Test database isolation
+- Deployment to a cloud service
+- More automated test coverage

@@ -164,6 +164,7 @@ I verified the implementation by:
 
 ## 7. My Reflection
 
+
 AI helped me learn faster, especially when I was stuck on errors or unfamiliar technologies.
 
 However, I learned that I still need to understand the code and the problem myself because I am responsible for the final solution.
