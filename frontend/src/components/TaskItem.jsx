@@ -1,5 +1,6 @@
 import { useState } from "react";
 import EditTask from "./EditTask";
+import "./TaskItem.css";
 
 function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -69,14 +70,33 @@ function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
   };
 
   return (
-    <div>
-      <h3>{task.title}</h3>
-      <p>Status: {task.completed ? "Completed" : "Pending"}</p>
+    <div className={`task-card ${task.completed ? "completed" : ""}`}>
+      <div className="task-header">
+        <h3>{task.title}</h3>
+        <span className={`task-status ${task.completed ? "completed" : "pending"}`}>
+          {task.completed ? "Completed" : "Pending"}
+        </span>
+      </div>
 
-      <button onClick={() => setIsEditing(true)}>Edit</button>
+      <p className="task-description">{task.description}</p>
 
-      <button onClick={handleDelete}>Delete</button>
-      <button onClick={handleComplete}>Complete</button>
+      <div className="task-actions">
+        <button className="task-button edit" onClick={() => setIsEditing(true)}>
+          Edit
+        </button>
+
+        <button className="task-button delete" onClick={handleDelete}>
+          Delete
+        </button>
+
+        <button
+          className={`task-button complete ${task.completed ? "done" : ""}`}
+          onClick={handleComplete}
+          disabled={task.completed}
+        >
+          {task.completed ? "Done" : "Complete"}
+        </button>
+      </div>
     </div>
   );
 }

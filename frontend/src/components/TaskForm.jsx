@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./TaskForm.css";
 
 function TaskForm({ onTaskCreated }) {
   const [title, setTitle] = useState("");
@@ -41,13 +42,14 @@ function TaskForm({ onTaskCreated }) {
   };
 
   return (
-    <div>
+    <div className="task-form-card">
       <h2>Create Task</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title</label>
+      <form className="task-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label className="form-label">Title</label>
           <input
+            className="form-input"
             type="text"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -55,19 +57,22 @@ function TaskForm({ onTaskCreated }) {
           />
         </div>
 
-        <div>
-          <label>Description</label>
+        <div className="form-field">
+          <label className="form-label">Description</label>
           <textarea
+            className="form-textarea"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             required
           />
         </div>
 
-        <button type="submit">Create Task</button>
+        <button className="task-submit-btn" type="submit">
+          Create Task
+        </button>
       </form>
 
-      {error && <p>{error}</p>}
+      {error && <p className="form-error">{error}</p>}
     </div>
   );
 }

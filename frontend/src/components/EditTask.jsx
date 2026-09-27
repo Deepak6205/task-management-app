@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./TaskForm.css";
 
 function EditTask({ task, onTaskUpdated, onCancel }) {
   const [title, setTitle] = useState(task.title);
@@ -41,13 +42,14 @@ function EditTask({ task, onTaskUpdated, onCancel }) {
   };
 
   return (
-    <div>
-      <h3>Edit Task</h3>
+    <div className="task-form-card">
+      <h2>Edit Task</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Title</label>
+      <form className="task-form" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label className="form-label">Title</label>
           <input
+            className="form-input"
             type="text"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
@@ -55,23 +57,28 @@ function EditTask({ task, onTaskUpdated, onCancel }) {
           />
         </div>
 
-        <div>
-          <label>Description</label>
+        <div className="form-field">
+          <label className="form-label">Description</label>
           <textarea
+            className="form-textarea"
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             required
           />
         </div>
 
-        <button type="submit">Save Changes</button>
+        <div className="task-actions">
+          <button className="task-submit-btn" type="submit">
+            Save Changes
+          </button>
 
-        <button type="button" onClick={onCancel}>
-          Cancel
-        </button>
+          <button className="task-button delete" type="button" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
       </form>
 
-      {error && <p>{error}</p>}
+      {error && <p className="form-error">{error}</p>}
     </div>
   );
 }
