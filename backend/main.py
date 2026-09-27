@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException,Depends
 from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy.exc import IntegrityError
 from database import engine, Base, SessionLocal
 from models import User, Task
 from auth import (
