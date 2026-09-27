@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { signupUser } from "../services/api";
 
-function SignupPage() {
+function SignupPage({ onSignupSuccess }) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -34,6 +34,10 @@ function SignupPage() {
         email: "",
         password: "",
       });
+
+      setTimeout(() => {
+        onSignupSuccess();
+      }, 1000);
     } catch (error) {
       setError(error.message);
     }

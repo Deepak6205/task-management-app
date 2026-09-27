@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { loginUser } from "../services/api";
 
-function LoginPage() {
+function LoginPage({ onSignup }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -30,10 +30,7 @@ function LoginPage() {
 
       localStorage.setItem("token", data.access_token);
 
-      setFormData({
-        email: "",
-        password: "",
-      });
+      window.location.reload();
     } catch (error) {
       setError(error.message);
     }
@@ -67,6 +64,13 @@ function LoginPage() {
         </div>
 
         <button type="submit">Login</button>
+
+        <p>
+          Don't have an account?{" "}
+          <button type="button" onClick={onSignup}>
+            Signup
+          </button>
+        </p>
       </form>
 
       {message && <p>{message}</p>}

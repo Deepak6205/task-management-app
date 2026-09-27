@@ -46,11 +46,15 @@ function Dashboard() {
       ),
     );
   };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
 
   return (
     <div>
       <h1>Dashboard</h1>
-
+      <button onClick={handleLogout}>Logout</button>
       <TaskForm onTaskCreated={handleTaskCreated} />
 
       {error && <p>{error}</p>}
