@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException,Depends
-from pydantic import BaseModel
-
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy.exc import IntegrityError
 from database import engine, Base, SessionLocal
 from models import User, Task
 from auth import (
@@ -11,9 +11,9 @@ from auth import (
 )
 
 class UserCreate(BaseModel):
-    name: str
-    email: str
-    password: str
+    name: str = Field(min_length=2)
+    email: EmailStr
+    password: str = Field(min_length=6)
 
 
 class TaskCreate(BaseModel):
@@ -50,8 +50,16 @@ def home():
 
 @app.post("/users")
 def create_user(user: UserCreate):
-
     db = SessionLocal()
+
+    existing_user = db.query(User).filter(User.email == user.email).first()
+
+    if existing_user:
+        db.close()
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
 
     hashed_password = hash_password(user.password)
 
@@ -64,7 +72,6 @@ def create_user(user: UserCreate):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-
     db.close()
 
     return {
@@ -75,7 +82,6 @@ def create_user(user: UserCreate):
             "email": new_user.email
         }
     }
-
 
 # ---------------- CREATE TASK ----------------
 
