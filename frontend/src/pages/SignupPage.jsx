@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { signupUser } from "../services/api";
+import "./SignupPage.css";
 
 function SignupPage({ onSignupSuccess }) {
   const [formData, setFormData] = useState({
@@ -44,48 +45,58 @@ function SignupPage({ onSignupSuccess }) {
   };
 
   return (
-    <div>
-      <h1>Signup</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name</label>
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+    <div className="signup-page">
+      <div className="signup-card">
+        <div className="auth-header">
+          <span className="auth-badge">Create account</span>
+          <h1>Signup</h1>
         </div>
 
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form className="signup-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label className="form-label">Name</label>
+            <input
+              className="text-input"
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+          <div className="form-field">
+            <label className="form-label">Email</label>
+            <input
+              className="text-input"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit">Create Account</button>
-      </form>
+          <div className="form-field">
+            <label className="form-label">Password</label>
+            <input
+              className="text-input"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      {message && <p>{message}</p>}
-      {error && <p>{error}</p>}
+          <button className="signup-button" type="submit">
+            Create Account
+          </button>
+        </form>
+
+        {message && <p className="signup-message">{message}</p>}
+        {error && <p className="signup-error">{error}</p>}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { loginUser } from "../services/api";
+import "./LoginPage.css";
 
 function LoginPage({ onSignup }) {
   const [formData, setFormData] = useState({
@@ -37,44 +38,53 @@ function LoginPage({ onSignup }) {
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+    <div className="login-page">
+      <div className="login-card">
+        <div className="auth-header">
+          <span className="auth-badge">Welcome back</span>
+          <h1>Login</h1>
         </div>
 
-        <div>
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label className="form-label">Email</label>
+            <input
+              className="text-input"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <button type="submit">Login</button>
+          <div className="form-field">
+            <label className="form-label">Password</label>
+            <input
+              className="text-input"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-        <p>
-          Don't have an account?{" "}
-          <button type="button" onClick={onSignup}>
+          <button className="primary-button" type="submit">
+            Login
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Don&apos;t have an account? {" "}
+          <button type="button" className="mini-link-button" onClick={onSignup}>
             Signup
           </button>
         </p>
-      </form>
 
-      {message && <p>{message}</p>}
-      {error && <p>{error}</p>}
+        {message && <p className="message">{message}</p>}
+        {error && <p className="error-message">{error}</p>}
+      </div>
     </div>
   );
 }
