@@ -3,6 +3,7 @@
   border: 1px solid #edf2f7;
   border-radius: 18px;
   padding: 20px;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.04);
 }
 
 .task-form-card h2 {
@@ -38,6 +39,7 @@
   background: #ffffff;
   color: #111827;
   resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .form-textarea {
@@ -49,6 +51,7 @@
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  transform: translateY(-1px);
 }
 
 .task-submit-btn {
@@ -59,6 +62,12 @@
   padding: 12px 17px;
   font-weight: 700;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 24px rgba(79, 70, 229, 0.22);
+}
+
+.task-submit-btn:hover {
+  transform: translateY(-2px);
 }
 
 .form-error {
@@ -66,4 +75,10 @@
   color: #dc2626;
   font-weight: 600;
   font-size: 0.92rem;
+}
+
+@media (max-width: 480px) {
+  .task-form-card {
+    padding: 16px;
+  }
 }
