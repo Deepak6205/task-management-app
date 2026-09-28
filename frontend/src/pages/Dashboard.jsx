@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import TaskForm from "../components/TaskForm";
 import TaskItem from "../components/TaskItem";
 import { API_URL } from "../services/api";
+import "./Dashboard.css";
+
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
@@ -35,11 +37,13 @@ function Dashboard() {
   const handleTaskCreated = (newTask) => {
     setTasks((previousTasks) => [...previousTasks, newTask]);
   };
+
   const handleTaskDeleted = (taskId) => {
     setTasks((previousTasks) =>
       previousTasks.filter((task) => task.id !== taskId),
     );
   };
+
   const handleTaskUpdated = (updatedTask) => {
     setTasks((previousTasks) =>
       previousTasks.map((task) =>
@@ -47,33 +51,45 @@ function Dashboard() {
       ),
     );
   };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     window.location.reload();
   };
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      <button onClick={handleLogout}>Logout</button>
-      <TaskForm onTaskCreated={handleTaskCreated} />
+    <div className="dashboard-page">
+      <div className="dashboard-header-row">
+        <h1 className="dashboard-title">Dashboard</h1>
+        <button className="logout-link" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
 
-      {error && <p>{error}</p>}
+      <div className="task-form-area">
+        <TaskForm onTaskCreated={handleTaskCreated} />
+      </div>
 
-      <h2>My Tasks</h2>
+      <div className="tasks-section">
+        <h2 className="tasks-heading">My Tasks</h2>
 
-      {tasks.length === 0 ? (
-        <p>No tasks found.</p>
-      ) : (
-        tasks.map((task) => (
-          <TaskItem
-            key={task.id}
-            task={task}
-            onTaskDeleted={handleTaskDeleted}
-            onTaskUpdated={handleTaskUpdated}
-          />
-        ))
-      )}
+        {error && <p className="dash-error">{error}</p>}
+
+        {tasks.length === 0 ? (
+          <p className="empty-state">No tasks found.</p>
+        ) : (
+          <div className="task-list">
+            {tasks.map((task) => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                onTaskDeleted={handleTaskDeleted}
+                onTaskUpdated={handleTaskUpdated}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

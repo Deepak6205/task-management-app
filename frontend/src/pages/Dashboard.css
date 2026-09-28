@@ -1,110 +1,90 @@
 .dashboard-page {
   min-height: 100vh;
-  padding: 40px 20px;
-  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(45, 212, 191, 0.1), transparent 35%);
+  padding: 28px 24px 40px;
+  background: #f3f4f6;
 }
 
-.dashboard-card {
-  max-width: 1100px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  border-radius: 28px;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
-  padding: 28px;
-  backdrop-filter: blur(12px);
-}
-
-.dashboard-header {
+.dashboard-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
-  margin-bottom: 26px;
+  gap: 16px;
+  margin-bottom: 18px;
 }
 
-.dashboard-header h1 {
+.dashboard-title {
+  margin: 0;
+  font-size: clamp(2.5rem, 4vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
   color: #111827;
-  font-size: clamp(2rem, 3vw, 2.5rem);
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-}
-
-.logout-button {
-  border: 1px solid #dfe6ee;
-  background: #ffffff;
-  color: #374151;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-weight: 700;
+.logout-link {
+  background: transparent;
+  border: none;
+  color: #111827;
+  font-size: 1rem;
+  padding: 0;
+  font-weight: 500;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  opacity: 0.8;
 }
 
-.logout-button:hover {
-  transform: translateY(-1px);
+.logout-link:hover {
+  opacity: 1;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-  gap: 22px;
+.task-form-area {
+  margin-bottom: 28px;
 }
 
-.task-column {
-  background: #ffffff;
-  border: 1px solid #edf2f7;
+.tasks-section {
+  background: rgba(255, 255, 255, 0.45);
   border-radius: 18px;
-  padding: 20px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+  padding: 18px 0 0;
 }
 
-.section-title {
+.tasks-heading {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 800;
   color: #111827;
-  font-size: 1.5rem;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .empty-state {
   background: #f8fafc;
   border: 1px dashed #dfe6ee;
   border-radius: 14px;
-  padding: 24px 16px;
-  text-align: center;
+  padding: 24px 18px;
   color: #6b7280;
+  text-align: center;
 }
 
 .dash-error {
   color: #dc2626;
   font-size: 0.92rem;
   font-weight: 600;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
-@media (max-width: 820px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 700px) {
+  .dashboard-page {
+    padding: 20px 14px 32px;
   }
 
-  .dashboard-header {
-    flex-direction: column;
+  .dashboard-header-row {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-title {
+    font-size: 2.3rem;
   }
 }
-
-@media (max-width: 480px) {
-  .dashboard-card {
-    padding: 18px;
-    border-radius: 20px;
-  }
-} 
