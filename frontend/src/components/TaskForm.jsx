@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./TaskForm.css";
-
+import { API_URL } from "../services/api";
 function TaskForm({ onTaskCreated }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -14,7 +14,7 @@ function TaskForm({ onTaskCreated }) {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/tasks", {
+      const response = await fetch(`${API_URL}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

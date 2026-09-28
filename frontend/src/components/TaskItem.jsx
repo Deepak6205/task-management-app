@@ -1,5 +1,6 @@
 import { useState } from "react";
 import EditTask from "./EditTask";
+import { API_URL } from "../services/api";
 import "./TaskItem.css";
 
 function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
@@ -9,7 +10,7 @@ function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/tasks/${task.id}`, {
+      const response = await fetch(`${API_URL}/tasks/${task.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ function TaskItem({ task, onTaskDeleted, onTaskUpdated }) {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/tasks/${task.id}/complete`,
+        `${API_URL}/tasks/${task.id}/complete`,
         {
           method: "PATCH",
           headers: {

@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import TaskForm from "../components/TaskForm";
 import TaskItem from "../components/TaskItem";
-import "./Dashboard.css";
-
+import { API_URL } from "../services/api";
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [error, setError] = useState("");
@@ -12,7 +11,7 @@ function Dashboard() {
       const token = localStorage.getItem("token");
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/tasks", {
+        const response = await fetch(`${API_URL}/tasks`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -54,42 +53,27 @@ function Dashboard() {
   };
 
   return (
-    <div className="dashboard-page">
-      <div className="dashboard-card">
-        <div className="dashboard-header">
-          <h1>Dashboard</h1>
-          <div className="header-actions">
-            <button className="logout-button" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </div>
+    <div>
+      <h1>Dashboard</h1>
+      <button onClick={handleLogout}>Logout</button>
+      <TaskForm onTaskCreated={handleTaskCreated} />
 
-        <div className="dashboard-grid">
-          <TaskForm onTaskCreated={handleTaskCreated} />
+      {error && <p>{error}</p>}
 
-          <div className="task-column">
-            <h2 className="section-title">My Tasks</h2>
+      <h2>My Tasks</h2>
 
-            {error && <p className="dash-error">{error}</p>}
-
-            {tasks.length === 0 ? (
-              <p className="empty-state">No tasks found.</p>
-            ) : (
-              <div className="task-list">
-                {tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onTaskDeleted={handleTaskDeleted}
-                    onTaskUpdated={handleTaskUpdated}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      {tasks.length === 0 ? (
+        <p>No tasks found.</p>
+      ) : (
+        tasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            onTaskDeleted={handleTaskDeleted}
+            onTaskUpdated={handleTaskUpdated}
+          />
+        ))
+      )}
     </div>
   );
 }

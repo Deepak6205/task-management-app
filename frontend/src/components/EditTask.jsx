@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./TaskForm.css";
-
+import { API_URL } from "../services/api";
 function EditTask({ task, onTaskUpdated, onCancel }) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description);
@@ -15,7 +15,7 @@ function EditTask({ task, onTaskUpdated, onCancel }) {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/tasks/${task.id}`,
+        `${API_URL}/tasks/${task.id}`,
         {
           method: "PUT",
           headers: {
